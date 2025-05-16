@@ -257,9 +257,6 @@ void HacksComp_Update(struct HacksComp* hacks) {
 	if (!hacks->CanSpeed || !hacks->Enabled) {
 		hacks->Speeding = false; hacks->HalfSpeeding = false;
 	}
-	if (!hacks->ReverseGravity || !hacks->Enabled) {
-		hacks->ReverseGravity = false;
-	}
 
 	hacks->CanDoubleJump = hacks->Enabled && hacks->CanSpeed;
 	Event_RaiseVoid(&UserEvents.HackPermsChanged);

@@ -813,8 +813,8 @@ static void LocalPlayer_DoRespawn(struct LocalPlayer* p) {
 	IVec3_Floor(&pos, &spawn);	
 
 	/* Spawn player at highest solid position to match vanilla Minecraft classic */
-	/* Only when player can noclip, since this can let you 'clip' to above solid blocks */
-	if (p->Hacks.CanNoclip) {
+	/* Only when player can noclip and not using reverse gravity, since this can let you 'clip' to above solid blocks */
+	if (p->Hacks.CanNoclip && !p->Hacks.ReverseGravity) {
 		AABB_Make(&bb, &spawn, &p->Base.Size);
 		for (y = pos.y; y <= World.Height; y++) {
 			spawnY = Respawn_HighestSolidY(&bb);
@@ -831,7 +831,13 @@ static void LocalPlayer_DoRespawn(struct LocalPlayer* p) {
 
 	/* Adjust the position to be slightly above the ground, so that */
 	/*  it's obvious to the player that they are being respawned */
-	spawn.y += 2.0f/16.0f;
+	cc_bool revg;
+	if (!Camera.RevGrav) {
+		spawn.y += 2.0f / 16.0f;
+	}
+	else {
+		spawn.y -= 2.0f / 16.0f;
+	}
 
 	update.flags = LU_HAS_POS | LU_HAS_YAW | LU_HAS_PITCH;
 	update.pos   = spawn;
@@ -1050,6 +1056,9 @@ void LocalPlayers_MoveToSpawn(struct LocationUpdate* update) {
 	
 	/* TODO: This needs to be before new map... */
 	Camera.CurrentPos = Camera.Active->GetPosition(0.0f);
+	if (!Camera.RevGrav) {
+		p->Spawn.y -= 1.0f;
+	}
 }
 
 void LocalPlayer_CalcDefaultSpawn(struct LocalPlayer* p, struct LocationUpdate* update) {

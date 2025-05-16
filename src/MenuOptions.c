@@ -1034,9 +1034,13 @@ static void    HS_SetSlide(cc_bool v) {
 	Options_SetBool(OPT_NOCLIP_SLIDE, v);
 }
 
-static int  HS_GetFOV(void)    { return Camera.Fov; }
+static int  HS_GetFOV(void)    { return Camera.DefaultFov; }
 static void HS_SetFOV(int fov) {
-	if (Camera.ZoomFov > fov) Camera.ZoomFov = fov;
+	int mult = Camera.RevGrav ? -1 : 1;
+
+	if (Camera.ZoomFov > fov && Camera.ZoomFov > 0) Camera.ZoomFov = fov * mult;
+	if (Camera.ZoomFov < fov && Camera.ZoomFov < 0) Camera.ZoomFov = fov * mult;
+	Camera.Fov = fov * mult;
 	Camera.DefaultFov = fov;
 
 	Options_SetInt(OPT_FIELD_OF_VIEW, fov);
