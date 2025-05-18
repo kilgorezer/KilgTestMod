@@ -1040,7 +1040,7 @@ static void HS_SetFOV(int fov) {
 
 	if (Camera.ZoomFov > fov && Camera.ZoomFov > 0) Camera.ZoomFov = fov * mult;
 	if (Camera.ZoomFov < fov && Camera.ZoomFov < 0) Camera.ZoomFov = fov * mult;
-	Camera.Fov = fov * mult;
+	if (Camera.RevGrav) Camera.Fov = fov * mult; // if it works dont fix it
 	Camera.DefaultFov = fov;
 
 	Options_SetInt(OPT_FIELD_OF_VIEW, fov);

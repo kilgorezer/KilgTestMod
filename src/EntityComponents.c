@@ -81,7 +81,7 @@ void AnimatedComp_Update(struct Entity* e, Vec3 oldPos, Vec3 newPos, float delta
 	anim->BobStrengthO = anim->BobStrengthN;
 	int BobStrengthN2 = -anim->BobStrengthN;
 	for (i = 0; i < 3; i++) {
-		AnimatedComp_DoTilt(Camera.RevGrav ? &BobStrengthN2 : &anim->BobStrengthN, !Game_ViewBobbing || !e->OnGround);
+		AnimatedComp_DoTilt(&anim->BobStrengthN, !Game_ViewBobbing || !e->OnGround);
 	}
 }
 
@@ -762,8 +762,8 @@ void PhysicsComp_UpdateVelocityState(struct PhysicsComp* comp) {
 		entity->Velocity.y += 0.12f * dir;
 		if (hacks->Speeding     && hacks->CanSpeed) entity->Velocity.y += 0.12f * dir;
 		if (hacks->HalfSpeeding && hacks->CanSpeed) entity->Velocity.y += 0.06f * dir;
-	} else if (comp->Jumping && Entity_TouchesAnyRope(entity) && entity->Velocity.y > 0.02f) {
-		entity->Velocity.y = 0.02f;
+	} else if (comp->Jumping && Entity_TouchesAnyRope(entity) && (Camera.RevGrav ? entity->Velocity.y < -0.02f : (entity->Velocity.y > 0.02f))) {
+		entity->Velocity.y = 0.02f * (Camera.RevGrav ? -1.0f : 1.0f);
 	}
 
 	if (!comp->Jumping) { comp->CanLiquidJump = false; return; }
@@ -815,11 +815,9 @@ void PhysicsComp_UpdateVelocityState(struct PhysicsComp* comp) {
 		}
 		comp->CanLiquidJump = false;
 	} else if (Entity_TouchesAnyRope(entity)) {
-		if(!Camera.RevGrav) {
-			entity->Velocity.y += (hacks->Speeding && hacks->CanSpeed) ? 0.15f : 0.10f;
-		} else {
-			entity->Velocity.y -= (hacks->Speeding && hacks->CanSpeed) ? 0.15f : 0.10f;
-		}
+		int climbDir = Camera.RevGrav ? -1 : 1;
+		float climbSpeed = (hacks->Speeding && hacks->CanSpeed) ? 0.15f : 0.10f;
+		entity->Velocity.y += climbSpeed * climbDir;
 		comp->CanLiquidJump = false;
 	} else if (entity->OnGround) {
 		PhysicsComp_DoNormalJump(comp);
@@ -1145,14 +1143,19 @@ static void SoundComp_GetSound(struct LocalPlayer* p) {
 	if (sounds_type != SOUND_NONE) return;
 
 	/* then check block standing on (feet) */
-	pos = p->Base.next.pos; pos.y += Camera.RevGrav ? 0.01f : -0.01f;
+	pos = p->Base.next.pos;
+	pos.y += Camera.RevGrav ? 0.01f + (p->Base.Size.y * p->Base.ModelScale.y) : -0.01f;
 	IVec3_Floor(&coords, &pos);
 	blockUnder = World_SafeGetBlock(coords.x, coords.y, coords.z);
-	maxY = coords.y + Blocks.MaxBB[blockUnder].y;
+
+	float blockFaceY = Camera.RevGrav
+		? coords.y + Blocks.MinBB[blockUnder].y
+		: coords.y + Blocks.MaxBB[blockUnder].y;
 
 	typeUnder    = Blocks.StepSounds[blockUnder];
 	collideUnder = Blocks.Collide[blockUnder];
-	if (maxY >= pos.y && collideUnder == COLLIDE_SOLID && typeUnder != SOUND_NONE) {
+	if (((!Camera.RevGrav && blockFaceY >= pos.y) || (Camera.RevGrav && blockFaceY <= pos.y))
+		&& collideUnder == COLLIDE_SOLID && typeUnder != SOUND_NONE) {
 		sounds_anyNonAir = true; sounds_type = typeUnder; return;
 	}
 
