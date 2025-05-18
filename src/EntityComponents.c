@@ -1144,7 +1144,7 @@ static void SoundComp_GetSound(struct LocalPlayer* p) {
 
 	/* then check block standing on (feet) */
 	pos = p->Base.next.pos;
-	pos.y += Camera.RevGrav ? 0.01f + (p->Base.Size.y * p->Base.ModelScale.y) : -0.01f;
+	pos.y += Camera.RevGrav ? 0.01f + p->Base.Size.y : -0.01f;
 	IVec3_Floor(&coords, &pos);
 	blockUnder = World_SafeGetBlock(coords.x, coords.y, coords.z);
 
