@@ -58,7 +58,7 @@ Vec3 Entity_GetEyePosition(struct Entity* e) {
 }
 
 float Entity_GetEyeHeight(struct Entity* e) {
-	return Camera.RevGrav ? (-e->Model->GetEyeY(e) + e->Size.y) * e->ModelScale.y : e->Model->GetEyeY(e) * e->ModelScale.y;
+	return Camera.RevGrav ? ((-e->Model->GetEyeY(e) / e->ModelScale.y + (e->Size.y))) * e->ModelScale.y : e->Model->GetEyeY(e) * e->ModelScale.y;
 }
 
 void Entity_GetTransform(struct Entity* e, Vec3 pos, Vec3 scale, struct Matrix* m) {
