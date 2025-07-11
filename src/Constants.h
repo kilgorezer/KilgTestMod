@@ -10,11 +10,11 @@ Copyright 2014-2023 ClassiCube | Licensed under BSD-3
 #define GAME_API_VER 1
 
 #if defined CC_BUILD_WEB
-#define GAME_APP_ALT   "ClassiCube 1.3.7 web mobile + Kilgorezer's Test Mod 1.1.3"
-#define GAME_APP_NAME  "ClassiCube 1.3.7 web + Kilgorezer's Test Mod 1.1.3"
+#define GAME_APP_ALT   "ClassiCube 1.3.7 web mobile + Kilgorezer's Test Mod 1.2.1"
+#define GAME_APP_NAME  "ClassiCube 1.3.7 web + Kilgorezer's Test Mod 1.2.1"
 #define GAME_APP_TITLE "Test Mod"
 #else
-#define GAME_APP_NAME  "ClassiCube 1.3.7 + Kilgorezer's Test Mod 1.1.3"
+#define GAME_APP_NAME  "ClassiCube 1.3.7 + Kilgorezer's Test Mod 1.2.1"
 #define GAME_APP_TITLE "Kilgorezer's Test Mod"
 #endif
 
